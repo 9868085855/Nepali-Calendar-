@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>नेपाली पात्रो 2082</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .calendar {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .week-header {
+      font-weight: bold;
+      background-color: #f0f0f0;
+    }
+    .day {
+      border: 1px solid #ddd;
+      height: 100px;
+      position: relative;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .day.festival {
+      background-color: #ffe4e1; /* हल्का गुलाबी - पर्वको लागि */
+    }
+    .day.today {
+      background-color: #d1e7dd; /* आजको दिनको लागि */
+    }
+    .date-nepali {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .date-english {
+      font-size: 10px;
+      color: gray;
+    }
+    .festival-name {
+      font-size: 10px;
+      color: red;
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button id="prevMonth" class="btn btn-primary">पछिल्लो महिना</button>
+    <h2 id="monthYear" class="text-center">बैशाख 2082</h2>
+    <button id="nextMonth" class="btn btn-primary">अगिल्लो महिना</button>
+  </div>
+  <div class="calendar">
+    <div class="row week-header">
+      <div class="col text-center">आइत</div>
+      <div class="col text-center">सोम</div>
+      <div class="col text-center">मंगल</div>
+      <div class="col text-center">बुध</div>
+      <div class="col text-center">बिही</div>
+      <div class="col text-center">शुक्र</div>
+      <div class="col text-center">शनि</div>
+    </div>
+    <div id="calendarDays" class="row flex-wrap">
+      <!-- Calendar days will be generated here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  const months = [
+    { name: 'बैशाख', days: 31, startDay: 1, startEngDate: new Date(2025, 3, 14) },
+    { name: 'जेठ', days: 31, startDay: 4, startEngDate: new Date(2025, 4, 15) },
+    { name: 'असार', days: 32, startDay: 0, startEngDate: new Date(2025, 5, 15) },
+    { name: 'साउन', days: 31, startDay: 4, startEngDate: new Date(2025, 6, 17) },
+    { name: 'भदौ', days: 31, startDay: 0, startEngDate: new Date(2025, 7, 17) },
+    { name: 'आश्विन', days: 31, startDay: 3, startEngDate: new Date(2025, 8, 17) },
+    { name: 'कार्तिक', days: 30, startDay: 6, startEngDate: new Date(2025, 9, 18) },
+    { name: 'मंसिर', days: 29, startDay: 1, startEngDate: new Date(2025, 10, 17) },
+    { name: 'पुष', days: 30, startDay: 2, startEngDate: new Date(2025, 11, 16) },
+    { name: 'माघ', days: 29, startDay: 4, startEngDate: new Date(2026, 0, 14) },
+    { name: 'फागुन', days: 30, startDay: 5, startEngDate: new Date(2026, 1, 14) },
+    { name: 'चैत्र', days: 30, startDay: 0, startEngDate: new Date(2026, 2, 16) },
+  ];
+
+  const festivals = {
+    'आश्विन-6': 'घटस्थापना',
+    'आश्विन-13': 'फूलपाती',
+    'आश्विन-14': 'महाष्टमी',
+    'आश्विन-15': 'महानवमी',
+    'आश्विन-16': 'विजयादशमी',
+    'कार्तिक-2': 'काग तिहार',
+    'कार्तिक-3': 'लक्ष्मी पूजा',
+    'कार्तिक-4': 'गाई तिहार',
+    'कार्तिक-5': 'गोवर्धन पूजा',
+    'कार्तिक-6': 'भाइटीका',
+    'कार्तिक-10': 'छठ पर्व'
+  };
+
+  const nepaliNumbers = ["०","१","२","३","४","५","६","७","८","९"];
+
+  let currentMonth = 0;
+
+  function renderCalendar() {
+    const calendarDays = document.getElementById('calendarDays');
+    const monthYear = document.getElementById('monthYear');
+    calendarDays.innerHTML = '';
+
+    const month = months[currentMonth];
+    monthYear.innerText = `${month.name} 2082`;
+
+    let startDay = month.startDay;
+    let engDate = new Date(month.startEngDate);
+
+    for (let i = 0; i < startDay; i++) {
+      const blank = document.createElement('div');
+      blank.className = 'col day';
+      calendarDays.appendChild(blank);
+    }
+
+    for (let d = 1; d <= month.days; d++) {
+      const day = document.createElement('div');
+      day.className = 'col day';
+
+      const nepDate = String(d).split('').map(n => nepaliNumbers[+n]).join('');
+      const dateNepali = `<div class="date-nepali">${nepDate}</div>`;
+      const dateEnglish = `<div class="date-english">${engDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>`;
+
+      day.innerHTML = dateNepali + dateEnglish;
+
+      const festKey = `${month.name}-${d}`;
+      if (festivals[festKey]) {
+        const fest = document.createElement('div');
+        fest.className = 'festival-name';
+        fest.innerText = festivals[festKey];
+        day.appendChild(fest);
+        day.classList.add('festival');
+      }
+
+      const today = new Date();
+      if (today.getDate() === engDate.getDate() && today.getMonth() === engDate.getMonth() && today.getFullYear() === engDate.getFullYear()) {
+        day.classList.add('today');
+      }
+
+      calendarDays.appendChild(day);
+      engDate.setDate(engDate.getDate() + 1);
+    }
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentMonth = (currentMonth - 1 + months.length) % months.length;
+    renderCalendar();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentMonth = (currentMonth + 1) % months.length;
+    renderCalendar();
+  });
+
+  renderCalendar();
+</script>
+</body>
+</html>
